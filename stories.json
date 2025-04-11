@@ -1,0 +1,35 @@
+[
+  {
+    "title": "The Creation",
+    "reference": "Genesis 1",
+    "summary": "God created the heavens and the earth in six days and rested on the seventh.",
+    "content": [
+      "In the beginning, God created the heaven and the earth.",
+      "And the earth was without form, and void; and darkness was upon the face of the deep.",
+      "And God said, Let there be light: and there was light.",
+      "And the evening and the morning were the first day."
+    ]
+  },
+  {
+    "title": "Noah and the Ark",
+    "reference": "Genesis 6-9",
+    "summary": "God instructed Noah to build an ark to save his family and animals from a flood.",
+    "content": [
+      "Noah was a just man and perfect in his generations, and Noah walked with God.",
+      "And God said unto Noah, The end of all flesh is come before me.",
+      "Make thee an ark of gopher wood.",
+      "And the waters prevailed upon the earth."
+    ]
+  },
+  {
+    "title": "David and Goliath",
+    "reference": "1 Samuel 17",
+    "summary": "Young David defeats the giant Goliath with a sling and faith in God.",
+    "content": [
+      "Then said David to the Philistine, Thou comest to me with a sword...",
+      "But I come to thee in the name of the Lord of hosts...",
+      "David put his hand in his bag, and took thence a stone, and slang it...",
+      "And smote the Philistine in his forehead..."
+    ]
+  }
+]

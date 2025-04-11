@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Complete Bible App</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 text-gray-800 px-4 py-6 max-w-3xl mx-auto">
+  <h1 class="text-3xl font-bold mb-4 text-center text-indigo-600">Bible App</h1>
+
+  <!-- Daily Verse -->
+  <div id="daily-verse" class="mb-6 bg-yellow-100 border-l-4 border-yellow-500 p-4 rounded shadow cursor-pointer hover:bg-yellow-200 transition">
+    <p class="text-gray-800"><strong>Daily Verse:</strong> Loading...</p>
+  </div>
+
+  <!-- Bible Reading -->
+  <div class="bg-white p-4 rounded shadow mb-6">
+    <div class="mb-4">
+      <label class="block font-semibold">Book:</label>
+      <select id="book-select" class="w-full p-2 border rounded mt-1"></select>
+    </div>
+    <div class="mb-4">
+      <label class="block font-semibold">Chapter:</label>
+      <select id="chapter-select" class="w-full p-2 border rounded mt-1"></select>
+    </div>
+    <div id="verses" class="space-y-2"></div>
+  </div>
+
+  <!-- Bible Stories -->
+  <hr class="my-6">
+  <h2 class="text-2xl font-semibold mb-2 text-center text-green-600">Bible Stories</h2>
+  <div id="story-list" class="space-y-4"></div>
+  <div id="story-content" class="bg-white p-4 rounded shadow mt-4 hidden"></div>
+<script>
+let bibleData = [];
+let bookSelect = document.getElementById("book-select");
+let chapterSelect = document.getElementById("chapter-select");
+let versesDiv = document.getElementById("verses");
+let dailyVerseDiv = document.getElementById("daily-verse");
+let dailyReference = null;
+
+// Load Bible XML
+fetch("en_kjv.xml")
+  .then(res => res.text())
+  .then(xmlText => {
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+    const books = Array.from(xmlDoc.getElementsByTagName("BIBLEBOOK"));
+
+    bibleData = books.map(book => {
+      const bookName = book.getAttribute("bname");
+      const chapters = Array.from(book.getElementsByTagName("CHAPTER")).map(chapter => {
+        return Array.from(chapter.getElementsByTagName("VERS")).map(verse => verse.textContent);
+      });
+      return { book: bookName, chapters };
+    });
+
+    populateBooks();
+    showDailyVerse();
+  });
+
+// Populate Book Dropdown
+function populateBooks() {
+  bookSelect.innerHTML = "";
+  bibleData.forEach((book, i) => {
+    const option = document.createElement("option");
+    option.value = i;
+    option.textContent = book.book;
+    bookSelect.appendChild(option);
+  });
+
+  bookSelect.onchange = function () {
+    populateChapters(this.value);
+  };
+
+  // Set default to first book
+  populateChapters(0);
+}
+
+// Populate Chapters
+function populateChapters(bookIndex) {
+  chapterSelect.innerHTML = "";
+  const chapters = bibleData[bookIndex].chapters;
+  chapters.forEach((_, i) => {
+    const option = document.createElement("option");
+    option.value = i;
+    option.textContent = `Chapter ${i + 1}`;
+    chapterSelect.appendChild(option);
+  });
+
+  chapterSelect.onchange = function () {
+    displayVerses(bookIndex, this.value);
+  };
+
+  chapterSelect.selectedIndex = 0;
+  displayVerses(bookIndex, 0);
+}
+
+// Display Verses
+function displayVerses(bookIndex, chapterIndex) {
+  const verses = bibleData[bookIndex].chapters[chapterIndex];
+  versesDiv.innerHTML = "";
+
+  verses.forEach((verse, i) => {
+    const p = document.createElement("p");
+    p.innerHTML = `<strong id="verse-${bookIndex}-${chapterIndex}-${i}">${i + 1}</strong> ${verse}`;
+    versesDiv.appendChild(p);
+  });
+}
+
+// Daily Verse
+function showDailyVerse() {
+  const bookIndex = Math.floor(Math.random() * bibleData.length);
+  const book = bibleData[bookIndex];
+  const chapterIndex = Math.floor(Math.random() * book.chapters.length);
+  const chapter = book.chapters[chapterIndex];
+  const verseIndex = Math.floor(Math.random() * chapter.length);
+  const verseText = chapter[verseIndex];
+
+  dailyReference = { bookIndex, chapterIndex, verseIndex, bookName: book.book, text: verseText };
+  dailyVerseDiv.innerHTML = `
+    <p><strong>Daily Verse:</strong> <em>${book.book} ${chapterIndex + 1}:${verseIndex + 1}</em> — "${verseText}"</p>
+  `;
+
+  dailyVerseDiv.addEventListener("click", () => {
+    bookSelect.selectedIndex = bookIndex;
+    populateChapters(bookIndex);
+
+    setTimeout(() => {
+      chapterSelect.selectedIndex = chapterIndex;
+      displayVerses(bookIndex, chapterIndex);
+
+      setTimeout(() => {
+        const verseEl = document.getElementById(`verse-${bookIndex}-${chapterIndex}-${verseIndex}`);
+        if (verseEl) {
+          verseEl.scrollIntoView({ behavior: "smooth", block: "center" });
+          verseEl.classList.add("bg-yellow-200", "rounded", "px-2");
+        }
+      }, 200);
+    }, 200);
+  });
+}
+</script>
+ </body>
+</html>
